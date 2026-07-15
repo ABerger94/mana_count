@@ -6,16 +6,14 @@
 <title>Mana Counter</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-0: #0a0a0f;
-    --bg-1: #121218;
-    --panel: rgba(255,255,255,0.04);
-    --panel-border: rgba(255,255,255,0.08);
-    --card-radius: 20px;
     --gap: 14px;
-    --ink: #f0eee8;
+    --ink: #f0e9d8;
+    --gold-1: #f6e6b4;
+    --gold-2: #c9a54a;
+    --gold-3: #7a5c22;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -32,41 +30,57 @@
 
   body {
     background:
-      radial-gradient(ellipse 60% 40% at 15% 0%, rgba(59,157,255,0.16), transparent 60%),
-      radial-gradient(ellipse 55% 40% at 100% 10%, rgba(255,107,87,0.14), transparent 60%),
-      radial-gradient(ellipse 60% 45% at 50% 100%, rgba(74,222,128,0.12), transparent 60%),
-      linear-gradient(180deg, var(--bg-1), var(--bg-0));
+      radial-gradient(1px 1px at 8% 22%, #fff, transparent),
+      radial-gradient(1px 1px at 82% 12%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 46% 8%, #fff, transparent),
+      radial-gradient(1px 1px at 92% 78%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 24% 66%, #fff, transparent),
+      radial-gradient(1px 1px at 65% 42%, #fff, transparent),
+      radial-gradient(1px 1px at 12% 88%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 55% 92%, #fff, transparent),
+      radial-gradient(1px 1px at 36% 34%, #fff, transparent),
+      radial-gradient(1px 1px at 74% 60%, #fff, transparent),
+      radial-gradient(ellipse 70% 45% at 50% 0%, rgba(120,90,190,0.16), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 50% 100%, rgba(20,50,90,0.35), transparent 65%),
+      linear-gradient(180deg, #0a0a14, #030308 60%, #060609);
     background-attachment: fixed;
+    background-repeat: no-repeat;
     position: relative;
   }
 
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.05;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-
   .app {
-    max-width: 760px;
+    max-width: 780px;
     margin: 0 auto;
-    padding: calc(env(safe-area-inset-top, 0) + 18px) 16px calc(env(safe-area-inset-bottom, 0) + 18px);
+    padding: calc(env(safe-area-inset-top, 0) + 18px) 14px calc(env(safe-area-inset-bottom, 0) + 18px);
     min-height: 100%;
     display: flex;
     flex-direction: column;
     position: relative;
   }
 
+  /* corner brackets for a framed-artifact feel */
+  .app::before, .app::after,
+  header .frame-tl, header .frame-tr { content: none; }
+
   header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 2px 16px;
+    padding: 4px 6px 18px;
     gap: 10px;
     flex-wrap: wrap;
+    position: relative;
+  }
+
+  header::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    bottom: 6px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-2) 20%, var(--gold-1) 50%, var(--gold-2) 80%, transparent);
+    opacity: 0.55;
   }
 
   .brand {
@@ -75,36 +89,29 @@
     gap: 10px;
   }
 
-  .brand-mark {
-    width: 30px;
-    height: 30px;
-    position: relative;
-    flex-shrink: 0;
-  }
-  .brand-mark span {
-    position: absolute;
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    box-shadow: 0 0 6px currentColor;
-  }
-  .brand-mark span:nth-child(1) { top: 0; left: 9px; color: #f4d35e; background: #f4d35e; }
-  .brand-mark span:nth-child(2) { top: 8px; left: 19px; color: #3b9dff; background: #3b9dff; }
-  .brand-mark span:nth-child(3) { top: 19px; left: 14px; color: #b388ff; background: #b388ff; }
-  .brand-mark span:nth-child(4) { top: 19px; left: 3px; color: #ff6b57; background: #ff6b57; }
-  .brand-mark span:nth-child(5) { top: 8px; left: -1px; color: #4ade80; background: #4ade80; }
-
-  header h1 {
+  .brand h1 {
     font-family: 'Cinzel', serif;
-    font-size: 1.3rem;
-    font-weight: 700;
+    font-size: 1.35rem;
+    font-weight: 800;
     margin: 0;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
-    background: linear-gradient(90deg, #f4d35e, #3b9dff, #b388ff, #ff6b57, #4ade80);
+    background: linear-gradient(180deg, var(--gold-1), var(--gold-2) 55%, var(--gold-3));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.15);
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand h1 .flourish {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    -webkit-text-fill-color: var(--gold-2);
+    color: var(--gold-2);
   }
 
   .header-actions {
@@ -113,50 +120,47 @@
     align-items: center;
   }
 
-  .total-pill {
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-    font-weight: 800;
-    background: var(--panel);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--panel-border);
-    border-radius: 999px;
-    padding: 8px 16px;
-    color: #fff;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-  }
-  .total-pill .total-label {
-    font-size: 0.62rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    opacity: 0.55;
-  }
-  .total-pill #total {
-    font-size: 1.05rem;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .reset-btn {
+  .badge {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: var(--panel);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--panel-border);
-    color: #ddd;
-    border-radius: 999px;
-    padding: 8px 14px;
-    font-size: 0.8rem;
+    font-family: 'Cinzel', serif;
     font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+    background: linear-gradient(160deg, #23262f, #101218);
+    border: 1px solid var(--gold-2);
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      0 4px 10px rgba(0,0,0,0.45);
+    border-radius: 999px;
+    padding: 7px 16px;
+    color: var(--gold-1);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
-  .reset-btn svg { width: 14px; height: 14px; }
-  .reset-btn:hover { background: rgba(255,255,255,0.08); }
-  .reset-btn:active { transform: scale(0.95); box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
+  .badge .diamond {
+    width: 6px;
+    height: 6px;
+    background: var(--gold-2);
+    transform: rotate(45deg);
+    box-shadow: 0 0 4px var(--gold-1);
+    flex-shrink: 0;
+  }
+  .badge #total {
+    color: #fff;
+    font-family: 'Manrope', sans-serif;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+  }
+
+  .reset-btn {
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+  .reset-btn:hover { background: linear-gradient(160deg, #2c303b, #15171e); }
+  .reset-btn:active { transform: scale(0.94); }
+  .reset-btn svg { width: 12px; height: 12px; stroke: var(--gold-1); }
 
   .grid {
     display: grid;
@@ -169,175 +173,234 @@
     .grid { grid-template-columns: repeat(3, 1fr); }
   }
 
+  /* ---------- Card: ornate metal-framed artifact ---------- */
   .card {
     --glow: #ffffff;
-    border-radius: var(--card-radius);
-    padding: 18px 12px 14px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
+    border-radius: 18px;
+    padding: 3px;
     position: relative;
-    min-height: 208px;
-    overflow: hidden;
-    isolation: isolate;
-    background: linear-gradient(155deg, var(--c1), var(--c2));
+    background: linear-gradient(155deg, var(--frame1), var(--frame2) 45%, var(--frame3) 100%);
     box-shadow:
-      0 12px 28px -12px rgba(0,0,0,0.55),
-      0 0 0 1px rgba(255,255,255,0.08) inset;
+      0 14px 30px -12px rgba(0,0,0,0.7),
+      0 0 0 1px rgba(0,0,0,0.4);
     transition: transform 0.18s cubic-bezier(.2,.8,.3,1.3), box-shadow 0.25s ease;
-  }
-
-  .card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(120% 90% at 15% -10%, rgba(255,255,255,0.35), transparent 55%);
-    mix-blend-mode: soft-light;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.15) inset;
-    pointer-events: none;
   }
 
   @media (hover: hover) {
     .card:hover {
       transform: translateY(-3px);
       box-shadow:
-        0 18px 34px -12px rgba(0,0,0,0.6),
-        0 0 26px -6px var(--glow),
-        0 0 0 1px rgba(255,255,255,0.1) inset;
+        0 20px 36px -12px rgba(0,0,0,0.75),
+        0 0 30px -8px var(--glow),
+        0 0 0 1px rgba(0,0,0,0.4);
     }
   }
 
-  .card > * { position: relative; z-index: 1; }
+  .card-inner {
+    flex: 1;
+    border-radius: 15px;
+    padding: 14px 10px 12px;
+    min-height: 236px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(120% 100% at 50% 10%, var(--panel1), var(--panel2) 55%, var(--panel3) 100%);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), inset 0 2px 10px rgba(0,0,0,0.5);
+  }
 
-  .symbol {
-    width: 42px;
-    height: 42px;
+  .rivet {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--gold-1), var(--gold-3));
+    box-shadow: 0 1px 2px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.3);
+    z-index: 2;
+  }
+  .rivet.tl { top: 6px; left: 6px; }
+  .rivet.tr { top: 6px; right: 6px; }
+  .rivet.bl { bottom: 6px; left: 6px; }
+  .rivet.br { bottom: 6px; right: 6px; }
+
+  .name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--label-ink);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .orb-wrap {
+    position: relative;
+    width: 78px;
+    height: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    z-index: 1;
+  }
+
+  .orb-ring {
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    border: 1.5px dashed rgba(246,230,180,0.45);
+    animation: spin 24s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .orb {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    font-size: 1.15rem;
-    margin-bottom: 6px;
-    background: radial-gradient(circle at 30% 25%, var(--sym-1), var(--sym-2));
+    background: radial-gradient(circle at 32% 28%, var(--orb1), var(--orb2) 55%, var(--orb3) 100%);
     box-shadow:
-      0 3px 8px rgba(0,0,0,0.35),
-      0 0 0 2px rgba(255,255,255,0.35) inset,
-      0 0 14px -2px var(--glow);
-    color: var(--sym-ink);
+      0 0 0 3px rgba(0,0,0,0.35),
+      0 0 0 4px rgba(246,230,180,0.35),
+      inset 0 3px 8px rgba(255,255,255,0.35),
+      inset 0 -6px 14px rgba(0,0,0,0.4),
+      0 0 22px -2px var(--glow),
+      0 0 40px -6px var(--glow);
   }
 
-  .name {
-    font-size: 0.68rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    opacity: 0.7;
-    margin-bottom: 2px;
+  .orb svg {
+    width: 40px;
+    height: 40px;
+    filter: drop-shadow(0 0 6px var(--glow));
   }
 
-  .count {
-    font-size: 2.9rem;
+  .count-pill {
+    font-family: 'Manrope', sans-serif;
     font-weight: 800;
-    line-height: 1;
-    margin: 4px 0 12px;
+    font-size: 1.5rem;
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
-    text-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    color: var(--gold-1);
+    background: linear-gradient(160deg, #1c1e26, #0a0b0f);
+    border: 1px solid var(--gold-2);
+    border-radius: 999px;
+    padding: 2px 20px;
+    min-width: 54px;
+    text-align: center;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.08);
+    margin-bottom: 10px;
     transition: transform 0.15s cubic-bezier(.3,1.5,.4,1);
+    position: relative;
+    z-index: 1;
   }
-  .count.bump { transform: scale(1.16); }
+  .count-pill.bump { transform: scale(1.14); }
 
   .buttons {
     display: flex;
     width: 100%;
-    gap: 8px;
+    gap: 16px;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
   }
 
   .stepper {
-    flex: 1;
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 13px;
-    height: 46px;
-    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--gold-3);
     cursor: pointer;
-    background: rgba(0,0,0,0.2);
-    color: inherit;
+    background: radial-gradient(circle at 32% 28%, var(--gold-1), var(--gold-2) 60%, var(--gold-3) 100%);
+    color: #3a2a08;
     touch-action: manipulation;
-    transition: transform 0.08s ease, box-shadow 0.15s ease, background 0.15s ease;
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,0.6),
+      inset 0 -3px 5px rgba(0,0,0,0.35),
+      0 3px 6px rgba(0,0,0,0.45);
+    transition: transform 0.08s ease, box-shadow 0.15s ease, filter 0.15s ease;
   }
   .stepper svg {
-    width: 18px;
-    height: 18px;
-    stroke: currentColor;
-    stroke-width: 2.6;
+    width: 16px;
+    height: 16px;
+    stroke: #3a2a08;
+    stroke-width: 3;
     fill: none;
     stroke-linecap: round;
   }
-  .stepper:active { transform: scale(0.9); }
-
-  .stepper.minus { background: rgba(0,0,0,0.28); }
-  .stepper.plus { background: rgba(255,255,255,0.24); }
+  .stepper:active { transform: scale(0.88); filter: brightness(0.92); }
 
   .stepper.charging {
     animation: charge 0.5s ease-in-out infinite;
   }
   @keyframes charge {
-    0%, 100% { box-shadow: 0 0 0 0 var(--glow); }
-    50% { box-shadow: 0 0 0 5px transparent, 0 0 16px 2px var(--glow); }
+    0%, 100% { box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -3px 5px rgba(0,0,0,0.35), 0 3px 6px rgba(0,0,0,0.45), 0 0 0 0 var(--glow); }
+    50% { box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -3px 5px rgba(0,0,0,0.35), 0 3px 6px rgba(0,0,0,0.45), 0 0 14px 4px var(--glow); }
   }
 
-  /* Color themes */
+  /* ---------- Per-color themes ---------- */
   .card.white {
-    --c1: #fdf6df; --c2: #e7d69f; --glow: #f4d35e;
-    --sym-1: #fffdf3; --sym-2: #e9d693; --sym-ink: #8a6d1a;
-    color: #4a3d14;
+    --frame1: #f4e6ba; --frame2: #b3903f; --frame3: #4a3712;
+    --panel1: #fdf6e2; --panel2: #e9d9a8; --panel3: #c7ab68;
+    --orb1: #fffbe0; --orb2: #f6d876; --orb3: #a9781a;
+    --glow: #f6d876;
+    --label-ink: #6b4f10;
   }
   .card.blue {
-    --c1: #2f8ff0; --c2: #0b3d91; --glow: #3b9dff;
-    --sym-1: #dff0ff; --sym-2: #6cb6ff; --sym-ink: #0b3d91;
-    color: #eaf3ff;
+    --frame1: #e8d59a; --frame2: #a9812f; --frame3: #3a2c0e;
+    --panel1: #1c3f73; --panel2: #0d2147; --panel3: #050b18;
+    --orb1: #cdeaff; --orb2: #3fa6ea; --orb3: #0b3d78;
+    --glow: #4fb2ff;
+    --label-ink: #dfeeff;
   }
   .card.black {
-    --c1: #35313d; --c2: #0a0a0d; --glow: #b388ff;
-    --sym-1: #4a4457; --sym-2: #1c1a20; --sym-ink: #d8cdf0;
-    color: #e9e6f0;
+    --frame1: #cfc9d6; --frame2: #6a6478; --frame3: #232130;
+    --panel1: #2c2b35; --panel2: #16151c; --panel3: #08070a;
+    --orb1: #55506a; --orb2: #211f2a; --orb3: #050507;
+    --glow: #a78bd6;
+    --label-ink: #e6e0f0;
   }
   .card.red {
-    --c1: #ef4136; --c2: #7f1d1d; --glow: #ff6b57;
-    --sym-1: #ffe0da; --sym-2: #ff8f7f; --sym-ink: #8a1f14;
-    color: #fff1ee;
+    --frame1: #e0a877; --frame2: #8a4a26; --frame3: #33170a;
+    --panel1: #4a2018; --panel2: #26100b; --panel3: #120705;
+    --orb1: #ffdca0; --orb2: #f0641f; --orb3: #7a1706;
+    --glow: #ff7a2e;
+    --label-ink: #ffe6d2;
   }
   .card.green {
-    --c1: #2fb457; --c2: #0f3d20; --glow: #4ade80;
-    --sym-1: #e3ffec; --sym-2: #7be3a0; --sym-ink: #0f3d20;
-    color: #eafff0;
+    --frame1: #b98d55; --frame2: #6e4a24; --frame3: #2e1e0d;
+    --panel1: #234a2c; --panel2: #12291a; --panel3: #081209;
+    --orb1: #d4ffdf; --orb2: #35a854; --orb3: #0c3b1c;
+    --glow: #4ade80;
+    --label-ink: #dbffe4;
   }
   .card.colorless {
-    --c1: #d7dade; --c2: #7a808a; --glow: #e9ebee;
-    --sym-1: #ffffff; --sym-2: #b7bcc4; --sym-ink: #4a4f58;
-    color: #21262e;
+    --frame1: #e5e9ee; --frame2: #9aa2ac; --frame3: #3d434b;
+    --panel1: #2b3040; --panel2: #14161f; --panel3: #060709;
+    --orb1: #ffffff; --orb2: #aeb9c8; --orb3: #454e5c;
+    --glow: #cfe0f5;
+    --label-ink: #eef1f6;
   }
 
   footer {
     text-align: center;
     font-size: 0.72rem;
-    color: rgba(240,238,232,0.35);
+    color: rgba(240,233,216,0.4);
     padding: 20px 0 4px;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
+    font-family: 'Cinzel', serif;
+    text-transform: uppercase;
+    font-size: 0.62rem;
   }
 </style>
 </head>
@@ -345,13 +408,12 @@
 <div class="app">
   <header>
     <div class="brand">
-      <div class="brand-mark"><span></span><span></span><span></span><span></span><span></span></div>
-      <h1>Mana Counter</h1>
+      <h1><span class="flourish">&#10022;</span>Mana Counter<span class="flourish">&#10022;</span></h1>
     </div>
     <div class="header-actions">
-      <div class="total-pill"><span class="total-label">Total</span><span id="total">0</span></div>
-      <button class="reset-btn" id="resetBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/></svg>
+      <div class="badge"><span class="diamond"></span>Total: <span id="total">0</span></div>
+      <button class="badge reset-btn" id="resetBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/></svg>
         Reset
       </button>
     </div>
@@ -359,18 +421,27 @@
 
   <div class="grid" id="grid"></div>
 
-  <footer>Tap to step &middot; hold to surge</footer>
+  <footer>Tap &plus;/&minus; for one &middot; hold for rapid count</footer>
 </div>
 
 <script>
 (function () {
+  const ICONS = {
+    white: '<svg viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22.5" y2="12"/><line x1="4.4" y1="4.4" x2="6.8" y2="6.8"/><line x1="17.2" y1="17.2" x2="19.6" y2="19.6"/><line x1="4.4" y1="19.6" x2="6.8" y2="17.2"/><line x1="17.2" y1="6.8" x2="19.6" y2="4.4"/></g><circle cx="12" cy="12" r="5.2" fill="currentColor"/></svg>',
+    blue: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C12 2 4.8 11.4 4.8 15.8a7.2 7.2 0 0 0 14.4 0C19.2 11.4 12 2 12 2Z"/></svg>',
+    black: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.2c-4.6 0-8.2 3.6-8.2 8 0 3 1.6 5.6 4 7v2a1 1 0 0 0 1 1h1.1v1.4c0 .3.3.6.6.6h1c.3 0 .6-.3.6-.6V20.2h.8v1.4c0 .3.3.6.6.6h1c.3 0 .6-.3.6-.6V20.2H16a1 1 0 0 0 1-1v-2c2.4-1.4 4-4 4-7 0-4.4-3.6-8-8.2-8Z"/><circle cx="9" cy="10.4" r="1.7" fill="var(--panel3)"/><circle cx="15" cy="10.4" r="1.7" fill="var(--panel3)"/><path fill="var(--panel3)" d="M11.1 12.8h1.8l-.9 2.1z"/></svg>',
+    red: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12.3 1.8c1.1 3.3-2 4.4-2.2 7.6-.1 1.4.9 2.4 2 2.4 1.3 0 2.1-1.1 1.9-2.3 1.3 1.1 2.6 3 2.6 5.3a6.6 6.6 0 1 1-13.2 0c0-3.4 1.7-4.6 2.3-6.9.3 1.1 1.1 1.7 1.1 1.7s-1.4-3.6 5.5-7.8Z"/></svg>',
+    green: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.3 7.6 8.4h1.9L5.8 14h3.6L6.6 19.6h10.8L14.6 14h3.6l-3.7-5.6h1.9L12 2.3Z"/><rect x="10.6" y="18.4" width="2.8" height="3.4" fill="currentColor"/></svg>',
+    colorless: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 2 3.8 12 12 22l8.2-10Z"/><path d="M12 2v20M3.8 12h16.4" opacity="0.55"/></svg>',
+  };
+
   const COLORS = [
-    { key: "white",     name: "White",     symbol: "W" },
-    { key: "blue",      name: "Blue",      symbol: "U" },
-    { key: "black",     name: "Black",     symbol: "B" },
-    { key: "red",       name: "Red",       symbol: "R" },
-    { key: "green",     name: "Green",     symbol: "G" },
-    { key: "colorless", name: "Colorless", symbol: "C" },
+    { key: "white",     name: "White" },
+    { key: "blue",      name: "Blue" },
+    { key: "black",     name: "Black" },
+    { key: "red",       name: "Red" },
+    { key: "green",     name: "Green" },
+    { key: "colorless", name: "Colorless" },
   ];
 
   const STORAGE_KEY = "manaCounterState";
@@ -424,18 +495,27 @@
     card.className = "card " + c.key;
 
     card.innerHTML = `
-      <div class="symbol">${c.symbol}</div>
-      <div class="name">${c.name}</div>
-      <div class="count">${state[c.key]}</div>
-      <div class="buttons">
-        <button class="stepper minus" aria-label="Decrease ${c.name}">${MINUS_ICON}</button>
-        <button class="stepper plus" aria-label="Increase ${c.name}">${PLUS_ICON}</button>
+      <div class="card-inner">
+        <div class="rivet tl"></div>
+        <div class="rivet tr"></div>
+        <div class="rivet bl"></div>
+        <div class="rivet br"></div>
+        <div class="name">${c.name}</div>
+        <div class="orb-wrap">
+          <div class="orb-ring"></div>
+          <div class="orb">${ICONS[c.key]}</div>
+        </div>
+        <div class="count-pill">${state[c.key]}</div>
+        <div class="buttons">
+          <button class="stepper minus" aria-label="Decrease ${c.name}">${MINUS_ICON}</button>
+          <button class="stepper plus" aria-label="Increase ${c.name}">${PLUS_ICON}</button>
+        </div>
       </div>
     `;
 
     grid.appendChild(card);
 
-    const countEl = card.querySelector(".count");
+    const countEl = card.querySelector(".count-pill");
     const minusBtn = card.querySelector(".minus");
     const plusBtn = card.querySelector(".plus");
 
@@ -478,7 +558,7 @@
     COLORS.forEach(c => {
       state[c.key] = 0;
     });
-    document.querySelectorAll(".count").forEach(el => { el.textContent = "0"; });
+    document.querySelectorAll(".count-pill").forEach(el => { el.textContent = "0"; });
     updateTotal();
     saveState();
   });
