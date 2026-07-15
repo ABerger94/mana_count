@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mana Counter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: #050308;
+    color: #f0e9d8;
+    overscroll-behavior: none;
+    user-select: none;
+    font-family: 'Cinzel', serif;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100dvh;
+    padding: 8px;
+  }
+
+  /* The faceplate stage: every overlay is positioned as a % of this box,
+     and every physical size derives from --scale so it all scales together
+     with the artwork regardless of viewport shape. */
+  .stage {
+    position: relative;
+    --stage-w: min(96vw, calc(96dvh * 704 / 1527));
+    --scale: calc(var(--stage-w) / 704);
+    width: var(--stage-w);
+    aspect-ratio: 704 / 1527;
+    margin: 0 auto;
+    border-radius: calc(var(--scale) * 34);
+    overflow: hidden;
+    box-shadow: 0 20px 60px -20px rgba(0,0,0,0.8);
+  }
+
+  .faceplate {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+
+  /* ---------- Generic hit targets ---------- */
+  .hit {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    touch-action: manipulation;
+  }
+
+  .hit::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 0 0 var(--glow, #fff);
+    opacity: 0;
+    transition: opacity 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  @media (hover: hover) {
+    .hit:hover::after {
+      opacity: 0.55;
+      box-shadow: 0 0 0 calc(var(--scale) * 4) var(--glow, #fff);
+    }
+  }
+
+  .hit:active::after {
+    opacity: 0.85;
+    box-shadow: 0 0 0 calc(var(--scale) * 6) var(--glow, #fff);
+  }
+
+  .hit.charging::after {
+    animation: charge 0.5s ease-in-out infinite;
+  }
+  @keyframes charge {
+    0%, 100% { opacity: 0.3; box-shadow: 0 0 0 calc(var(--scale) * 3) var(--glow, #fff); }
+    50% { opacity: 0.95; box-shadow: 0 0 0 calc(var(--scale) * 8) var(--glow, #fff); }
+  }
+
+  .btn {
+    width: calc(var(--scale) * 78);
+    height: calc(var(--scale) * 78);
+  }
+
+  .reset-hit {
+    width: calc(var(--scale) * 82);
+    height: calc(var(--scale) * 82);
+    border-radius: 50%;
+  }
+
+  /* ---------- Count readouts ---------- */
+  .reading {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: calc(var(--scale) * 100);
+    text-align: center;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    font-size: calc(var(--scale) * 25);
+    letter-spacing: 0.02em;
+    pointer-events: none;
+    color: var(--ink, #ffe9b0);
+    text-shadow:
+      0 0 calc(var(--scale) * 10) var(--glow, #ffcf6b),
+      0 calc(var(--scale) * 1) calc(var(--scale) * 2) rgba(0,0,0,0.9);
+    transition: transform 0.15s cubic-bezier(.3,1.5,.4,1);
+  }
+  .reading.bump { transform: translate(-50%, -50%) scale(1.22); }
+
+  /* ---------- Positions (percent of stage, from source art at 704x1527) ---------- */
+  .white-minus  { left: 15.625%; top: 37.001%; }
+  .white-plus   { left: 36.648%; top: 37.001%; }
+  .white-read   { left: 27.273%; top: 32.7%; }
+
+  .blue-minus   { left: 64.631%; top: 37.001%; }
+  .blue-plus    { left: 85.227%; top: 37.001%; }
+  .blue-read    { left: 75.994%; top: 32.7%; }
+
+  .black-minus  { left: 15.625%; top: 63.196%; }
+  .black-plus   { left: 36.648%; top: 63.196%; }
+  .black-read   { left: 27.273%; top: 58.9%; }
+
+  .red-minus    { left: 64.631%; top: 63.196%; }
+  .red-plus     { left: 85.227%; top: 63.196%; }
+  .red-read     { left: 75.994%; top: 58.9%; }
+
+  .green-minus  { left: 15.625%; top: 89.522%; }
+  .green-plus   { left: 36.648%; top: 89.522%; }
+  .green-read   { left: 27.273%; top: 85.2%; }
+
+  .colorless-minus { left: 64.631%; top: 89.522%; }
+  .colorless-plus  { left: 85.227%; top: 89.522%; }
+  .colorless-read  { left: 75.994%; top: 85.2%; }
+
+  .reset-hit { left: 91.619%; top: 13.425%; }
+
+  /* ---------- Per-color glow / ink ---------- */
+  .white-minus, .white-plus  { --glow: #f4d35e; }
+  .white-read  { --glow: #f4d35e; --ink: #fff3cf; }
+
+  .blue-minus, .blue-plus    { --glow: #4fb2ff; }
+  .blue-read   { --glow: #4fb2ff; --ink: #d8f0ff; }
+
+  .black-minus, .black-plus  { --glow: #a78bd6; }
+  .black-read  { --glow: #a78bd6; --ink: #e7dcff; }
+
+  .red-minus, .red-plus      { --glow: #ff7a2e; }
+  .red-read    { --glow: #ff7a2e; --ink: #ffdcc0; }
+
+  .green-minus, .green-plus  { --glow: #4ade80; }
+  .green-read  { --glow: #4ade80; --ink: #dbffe4; }
+
+  .colorless-minus, .colorless-plus { --glow: #cfe0f5; }
+  .colorless-read { --glow: #cfe0f5; --ink: #f2f7ff; }
+
+  .reset-hit { --glow: #f4d35e; }
+
+  footer {
+    position: fixed;
+    bottom: 4px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.65rem;
+    color: rgba(240,233,216,0.35);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <img class="faceplate" src="assets/faceplate.jpg" alt="Arcanum Mana Chronicle faceplate" draggable="false">
+
+    <div class="reading white-read" id="read-white">0</div>
+    <div class="reading blue-read" id="read-blue">0</div>
+    <div class="reading black-read" id="read-black">0</div>
+    <div class="reading red-read" id="read-red">0</div>
+    <div class="reading green-read" id="read-green">0</div>
+    <div class="reading colorless-read" id="read-colorless">0</div>
+
+    <button class="hit btn white-minus" data-color="white" data-delta="-1" aria-label="Decrease White"></button>
+    <button class="hit btn white-plus"  data-color="white" data-delta="1"  aria-label="Increase White"></button>
+
+    <button class="hit btn blue-minus" data-color="blue" data-delta="-1" aria-label="Decrease Blue"></button>
+    <button class="hit btn blue-plus"  data-color="blue" data-delta="1"  aria-label="Increase Blue"></button>
+
+    <button class="hit btn black-minus" data-color="black" data-delta="-1" aria-label="Decrease Black"></button>
+    <button class="hit btn black-plus"  data-color="black" data-delta="1"  aria-label="Increase Black"></button>
+
+    <button class="hit btn red-minus" data-color="red" data-delta="-1" aria-label="Decrease Red"></button>
+    <button class="hit btn red-plus"  data-color="red" data-delta="1"  aria-label="Increase Red"></button>
+
+    <button class="hit btn green-minus" data-color="green" data-delta="-1" aria-label="Decrease Green"></button>
+    <button class="hit btn green-plus"  data-color="green" data-delta="1"  aria-label="Increase Green"></button>
+
+    <button class="hit btn colorless-minus" data-color="colorless" data-delta="-1" aria-label="Decrease Colorless"></button>
+    <button class="hit btn colorless-plus"  data-color="colorless" data-delta="1"  aria-label="Increase Colorless"></button>
+
+    <button class="hit reset-hit" id="resetBtn" aria-label="Reset all"></button>
+  </div>
+
+  <footer>Tap to step &middot; hold to surge</footer>
+
+<script>
+(function () {
+  const COLORS = ["white", "blue", "black", "red", "green", "colorless"];
+  const STORAGE_KEY = "manaCounterState";
+  const HOLD_DELAY = 400;
+  const HOLD_INTERVAL = 90;
+
+  let state = loadState();
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const s = {};
+        COLORS.forEach(c => { s[c] = Number.isFinite(parsed[c]) ? parsed[c] : 0; });
+        return s;
+      }
+    } catch (e) {}
+    const s = {};
+    COLORS.forEach(c => { s[c] = 0; });
+    return s;
+  }
+
+  function saveState() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  function render(color) {
+    const el = document.getElementById("read-" + color);
+    el.textContent = state[color];
+    el.classList.remove("bump");
+    void el.offsetWidth;
+    el.classList.add("bump");
+  }
+
+  function setCount(color, value) {
+    state[color] = Math.max(0, value);
+    render(color);
+    saveState();
+  }
+
+  document.querySelectorAll(".hit[data-color]").forEach(btn => {
+    const color = btn.dataset.color;
+    const delta = parseInt(btn.dataset.delta, 10);
+    let holdTimeout = null;
+    let holdInterval = null;
+
+    const step = () => setCount(color, state[color] + delta);
+
+    const start = (e) => {
+      e.preventDefault();
+      step();
+      holdTimeout = setTimeout(() => {
+        btn.classList.add("charging");
+        holdInterval = setInterval(step, HOLD_INTERVAL);
+      }, HOLD_DELAY);
+    };
+
+    const stop = () => {
+      clearTimeout(holdTimeout);
+      clearInterval(holdInterval);
+      holdTimeout = null;
+      holdInterval = null;
+      btn.classList.remove("charging");
+    };
+
+    btn.addEventListener("pointerdown", start);
+    btn.addEventListener("pointerup", stop);
+    btn.addEventListener("pointerleave", stop);
+    btn.addEventListener("pointercancel", stop);
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    COLORS.forEach(c => {
+      state[c] = 0;
+      render(c);
+    });
+    saveState();
+  });
+
+  COLORS.forEach(render);
+})();
+</script>
+</body>
+</html>
