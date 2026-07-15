@@ -6,455 +6,231 @@
 <title>Mana Counter</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --gap: 14px;
-    --ink: #f0e9d8;
-    --gold-1: #f6e6b4;
-    --gold-2: #c9a54a;
-    --gold-3: #7a5c22;
-  }
-
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
-    color: var(--ink);
+    min-height: 100%;
+    background: #050308;
+    color: #f0e9d8;
     overscroll-behavior: none;
     user-select: none;
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Cinzel', serif;
   }
 
   body {
-    background:
-      radial-gradient(1px 1px at 8% 22%, #fff, transparent),
-      radial-gradient(1px 1px at 82% 12%, #fff, transparent),
-      radial-gradient(1.5px 1.5px at 46% 8%, #fff, transparent),
-      radial-gradient(1px 1px at 92% 78%, #fff, transparent),
-      radial-gradient(1.5px 1.5px at 24% 66%, #fff, transparent),
-      radial-gradient(1px 1px at 65% 42%, #fff, transparent),
-      radial-gradient(1px 1px at 12% 88%, #fff, transparent),
-      radial-gradient(1.5px 1.5px at 55% 92%, #fff, transparent),
-      radial-gradient(1px 1px at 36% 34%, #fff, transparent),
-      radial-gradient(1px 1px at 74% 60%, #fff, transparent),
-      radial-gradient(ellipse 70% 45% at 50% 0%, rgba(120,90,190,0.16), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 50% 100%, rgba(20,50,90,0.35), transparent 65%),
-      linear-gradient(180deg, #0a0a14, #030308 60%, #060609);
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    position: relative;
-  }
-
-  .app {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: calc(env(safe-area-inset-top, 0) + 18px) 14px calc(env(safe-area-inset-bottom, 0) + 18px);
-    min-height: 100%;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-  }
-
-  /* corner brackets for a framed-artifact feel */
-  .app::before, .app::after,
-  header .frame-tl, header .frame-tr { content: none; }
-
-  header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 4px 6px 18px;
-    gap: 10px;
-    flex-wrap: wrap;
-    position: relative;
+    justify-content: center;
+    min-height: 100dvh;
+    padding: 8px;
   }
 
-  header::after {
+  /* The faceplate stage: every overlay is positioned as a % of this box,
+     and every physical size derives from --scale so it all scales together
+     with the artwork regardless of viewport shape. */
+  .stage {
+    position: relative;
+    --stage-w: min(96vw, calc(96dvh * 704 / 1527));
+    --scale: calc(var(--stage-w) / 704);
+    width: var(--stage-w);
+    aspect-ratio: 704 / 1527;
+    margin: 0 auto;
+    border-radius: calc(var(--scale) * 34);
+    overflow: hidden;
+    box-shadow: 0 20px 60px -20px rgba(0,0,0,0.8);
+  }
+
+  .faceplate {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+
+  /* ---------- Generic hit targets ---------- */
+  .hit {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    touch-action: manipulation;
+  }
+
+  .hit::after {
     content: "";
     position: absolute;
-    left: 4px;
-    right: 4px;
-    bottom: 6px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold-2) 20%, var(--gold-1) 50%, var(--gold-2) 80%, transparent);
-    opacity: 0.55;
-  }
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .brand h1 {
-    font-family: 'Cinzel', serif;
-    font-size: 1.35rem;
-    font-weight: 800;
-    margin: 0;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    background: linear-gradient(180deg, var(--gold-1), var(--gold-2) 55%, var(--gold-3));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.15);
-    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .brand h1 .flourish {
-    font-size: 0.8rem;
-    opacity: 0.8;
-    -webkit-text-fill-color: var(--gold-2);
-    color: var(--gold-2);
-  }
-
-  .header-actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    background: linear-gradient(160deg, #23262f, #101218);
-    border: 1px solid var(--gold-2);
-    box-shadow:
-      0 0 0 1px rgba(0,0,0,0.5),
-      inset 0 1px 0 rgba(255,255,255,0.08),
-      0 4px 10px rgba(0,0,0,0.45);
-    border-radius: 999px;
-    padding: 7px 16px;
-    color: var(--gold-1);
-    font-size: 0.78rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .badge .diamond {
-    width: 6px;
-    height: 6px;
-    background: var(--gold-2);
-    transform: rotate(45deg);
-    box-shadow: 0 0 4px var(--gold-1);
-    flex-shrink: 0;
-  }
-  .badge #total {
-    color: #fff;
-    font-family: 'Manrope', sans-serif;
-    font-variant-numeric: tabular-nums;
-    font-weight: 800;
-  }
-
-  .reset-btn {
-    cursor: pointer;
-    transition: transform 0.1s ease, box-shadow 0.15s ease, background 0.15s ease;
-  }
-  .reset-btn:hover { background: linear-gradient(160deg, #2c303b, #15171e); }
-  .reset-btn:active { transform: scale(0.94); }
-  .reset-btn svg { width: 12px; height: 12px; stroke: var(--gold-1); }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--gap);
-    flex: 1;
-  }
-
-  @media (min-width: 560px) {
-    .grid { grid-template-columns: repeat(3, 1fr); }
-  }
-
-  /* ---------- Card: ornate metal-framed artifact ---------- */
-  .card {
-    --glow: #ffffff;
-    display: flex;
-    border-radius: 18px;
-    padding: 3px;
-    position: relative;
-    background: linear-gradient(155deg, var(--frame1), var(--frame2) 45%, var(--frame3) 100%);
-    box-shadow:
-      0 14px 30px -12px rgba(0,0,0,0.7),
-      0 0 0 1px rgba(0,0,0,0.4);
-    transition: transform 0.18s cubic-bezier(.2,.8,.3,1.3), box-shadow 0.25s ease;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 0 0 var(--glow, #fff);
+    opacity: 0;
+    transition: opacity 0.15s ease, box-shadow 0.15s ease;
   }
 
   @media (hover: hover) {
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow:
-        0 20px 36px -12px rgba(0,0,0,0.75),
-        0 0 30px -8px var(--glow),
-        0 0 0 1px rgba(0,0,0,0.4);
+    .hit:hover::after {
+      opacity: 0.55;
+      box-shadow: 0 0 0 calc(var(--scale) * 4) var(--glow, #fff);
     }
   }
 
-  .card-inner {
-    flex: 1;
-    border-radius: 15px;
-    padding: 14px 10px 12px;
-    min-height: 236px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-    background: radial-gradient(120% 100% at 50% 10%, var(--panel1), var(--panel2) 55%, var(--panel3) 100%);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), inset 0 2px 10px rgba(0,0,0,0.5);
+  .hit:active::after {
+    opacity: 0.85;
+    box-shadow: 0 0 0 calc(var(--scale) * 6) var(--glow, #fff);
   }
 
-  .rivet {
-    position: absolute;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, var(--gold-1), var(--gold-3));
-    box-shadow: 0 1px 2px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.3);
-    z-index: 2;
-  }
-  .rivet.tl { top: 6px; left: 6px; }
-  .rivet.tr { top: 6px; right: 6px; }
-  .rivet.bl { bottom: 6px; left: 6px; }
-  .rivet.br { bottom: 6px; right: 6px; }
-
-  .name {
-    font-family: 'Cinzel', serif;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--label-ink);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-    margin-bottom: 6px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .orb-wrap {
-    position: relative;
-    width: 78px;
-    height: 78px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 8px;
-    z-index: 1;
-  }
-
-  .orb-ring {
-    position: absolute;
-    inset: -5px;
-    border-radius: 50%;
-    border: 1.5px dashed rgba(246,230,180,0.45);
-    animation: spin 24s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .orb {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(circle at 32% 28%, var(--orb1), var(--orb2) 55%, var(--orb3) 100%);
-    box-shadow:
-      0 0 0 3px rgba(0,0,0,0.35),
-      0 0 0 4px rgba(246,230,180,0.35),
-      inset 0 3px 8px rgba(255,255,255,0.35),
-      inset 0 -6px 14px rgba(0,0,0,0.4),
-      0 0 22px -2px var(--glow),
-      0 0 40px -6px var(--glow);
-  }
-
-  .orb svg {
-    width: 40px;
-    height: 40px;
-    filter: drop-shadow(0 0 6px var(--glow));
-  }
-
-  .count-pill {
-    font-family: 'Manrope', sans-serif;
-    font-weight: 800;
-    font-size: 1.5rem;
-    font-variant-numeric: tabular-nums;
-    color: var(--gold-1);
-    background: linear-gradient(160deg, #1c1e26, #0a0b0f);
-    border: 1px solid var(--gold-2);
-    border-radius: 999px;
-    padding: 2px 20px;
-    min-width: 54px;
-    text-align: center;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.08);
-    margin-bottom: 10px;
-    transition: transform 0.15s cubic-bezier(.3,1.5,.4,1);
-    position: relative;
-    z-index: 1;
-  }
-  .count-pill.bump { transform: scale(1.14); }
-
-  .buttons {
-    display: flex;
-    width: 100%;
-    gap: 16px;
-    justify-content: center;
-    position: relative;
-    z-index: 1;
-  }
-
-  .stepper {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    width: 42px;
-    height: 42px;
-    border: 1px solid var(--gold-3);
-    cursor: pointer;
-    background: radial-gradient(circle at 32% 28%, var(--gold-1), var(--gold-2) 60%, var(--gold-3) 100%);
-    color: #3a2a08;
-    touch-action: manipulation;
-    box-shadow:
-      inset 0 1px 1px rgba(255,255,255,0.6),
-      inset 0 -3px 5px rgba(0,0,0,0.35),
-      0 3px 6px rgba(0,0,0,0.45);
-    transition: transform 0.08s ease, box-shadow 0.15s ease, filter 0.15s ease;
-  }
-  .stepper svg {
-    width: 16px;
-    height: 16px;
-    stroke: #3a2a08;
-    stroke-width: 3;
-    fill: none;
-    stroke-linecap: round;
-  }
-  .stepper:active { transform: scale(0.88); filter: brightness(0.92); }
-
-  .stepper.charging {
+  .hit.charging::after {
     animation: charge 0.5s ease-in-out infinite;
   }
   @keyframes charge {
-    0%, 100% { box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -3px 5px rgba(0,0,0,0.35), 0 3px 6px rgba(0,0,0,0.45), 0 0 0 0 var(--glow); }
-    50% { box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -3px 5px rgba(0,0,0,0.35), 0 3px 6px rgba(0,0,0,0.45), 0 0 14px 4px var(--glow); }
+    0%, 100% { opacity: 0.3; box-shadow: 0 0 0 calc(var(--scale) * 3) var(--glow, #fff); }
+    50% { opacity: 0.95; box-shadow: 0 0 0 calc(var(--scale) * 8) var(--glow, #fff); }
   }
 
-  /* ---------- Per-color themes ---------- */
-  .card.white {
-    --frame1: #f4e6ba; --frame2: #b3903f; --frame3: #4a3712;
-    --panel1: #fdf6e2; --panel2: #e9d9a8; --panel3: #c7ab68;
-    --orb1: #fffbe0; --orb2: #f6d876; --orb3: #a9781a;
-    --glow: #f6d876;
-    --label-ink: #6b4f10;
+  .btn {
+    width: calc(var(--scale) * 78);
+    height: calc(var(--scale) * 78);
   }
-  .card.blue {
-    --frame1: #e8d59a; --frame2: #a9812f; --frame3: #3a2c0e;
-    --panel1: #1c3f73; --panel2: #0d2147; --panel3: #050b18;
-    --orb1: #cdeaff; --orb2: #3fa6ea; --orb3: #0b3d78;
-    --glow: #4fb2ff;
-    --label-ink: #dfeeff;
+
+  .reset-hit {
+    width: calc(var(--scale) * 82);
+    height: calc(var(--scale) * 82);
+    border-radius: 50%;
   }
-  .card.black {
-    --frame1: #cfc9d6; --frame2: #6a6478; --frame3: #232130;
-    --panel1: #2c2b35; --panel2: #16151c; --panel3: #08070a;
-    --orb1: #55506a; --orb2: #211f2a; --orb3: #050507;
-    --glow: #a78bd6;
-    --label-ink: #e6e0f0;
+
+  /* ---------- Count readouts ---------- */
+  .reading {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: calc(var(--scale) * 100);
+    text-align: center;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    font-size: calc(var(--scale) * 25);
+    letter-spacing: 0.02em;
+    pointer-events: none;
+    color: var(--ink, #ffe9b0);
+    text-shadow:
+      0 0 calc(var(--scale) * 10) var(--glow, #ffcf6b),
+      0 calc(var(--scale) * 1) calc(var(--scale) * 2) rgba(0,0,0,0.9);
+    transition: transform 0.15s cubic-bezier(.3,1.5,.4,1);
   }
-  .card.red {
-    --frame1: #e0a877; --frame2: #8a4a26; --frame3: #33170a;
-    --panel1: #4a2018; --panel2: #26100b; --panel3: #120705;
-    --orb1: #ffdca0; --orb2: #f0641f; --orb3: #7a1706;
-    --glow: #ff7a2e;
-    --label-ink: #ffe6d2;
-  }
-  .card.green {
-    --frame1: #b98d55; --frame2: #6e4a24; --frame3: #2e1e0d;
-    --panel1: #234a2c; --panel2: #12291a; --panel3: #081209;
-    --orb1: #d4ffdf; --orb2: #35a854; --orb3: #0c3b1c;
-    --glow: #4ade80;
-    --label-ink: #dbffe4;
-  }
-  .card.colorless {
-    --frame1: #e5e9ee; --frame2: #9aa2ac; --frame3: #3d434b;
-    --panel1: #2b3040; --panel2: #14161f; --panel3: #060709;
-    --orb1: #ffffff; --orb2: #aeb9c8; --orb3: #454e5c;
-    --glow: #cfe0f5;
-    --label-ink: #eef1f6;
-  }
+  .reading.bump { transform: translate(-50%, -50%) scale(1.22); }
+
+  /* ---------- Positions (percent of stage, from source art at 704x1527) ---------- */
+  .white-minus  { left: 15.625%; top: 37.001%; }
+  .white-plus   { left: 36.648%; top: 37.001%; }
+  .white-read   { left: 27.273%; top: 32.7%; }
+
+  .blue-minus   { left: 64.631%; top: 37.001%; }
+  .blue-plus    { left: 85.227%; top: 37.001%; }
+  .blue-read    { left: 75.994%; top: 32.7%; }
+
+  .black-minus  { left: 15.625%; top: 63.196%; }
+  .black-plus   { left: 36.648%; top: 63.196%; }
+  .black-read   { left: 27.273%; top: 58.9%; }
+
+  .red-minus    { left: 64.631%; top: 63.196%; }
+  .red-plus     { left: 85.227%; top: 63.196%; }
+  .red-read     { left: 75.994%; top: 58.9%; }
+
+  .green-minus  { left: 15.625%; top: 89.522%; }
+  .green-plus   { left: 36.648%; top: 89.522%; }
+  .green-read   { left: 27.273%; top: 85.2%; }
+
+  .colorless-minus { left: 64.631%; top: 89.522%; }
+  .colorless-plus  { left: 85.227%; top: 89.522%; }
+  .colorless-read  { left: 75.994%; top: 85.2%; }
+
+  .reset-hit { left: 91.619%; top: 13.425%; }
+
+  /* ---------- Per-color glow / ink ---------- */
+  .white-minus, .white-plus  { --glow: #f4d35e; }
+  .white-read  { --glow: #f4d35e; --ink: #fff3cf; }
+
+  .blue-minus, .blue-plus    { --glow: #4fb2ff; }
+  .blue-read   { --glow: #4fb2ff; --ink: #d8f0ff; }
+
+  .black-minus, .black-plus  { --glow: #a78bd6; }
+  .black-read  { --glow: #a78bd6; --ink: #e7dcff; }
+
+  .red-minus, .red-plus      { --glow: #ff7a2e; }
+  .red-read    { --glow: #ff7a2e; --ink: #ffdcc0; }
+
+  .green-minus, .green-plus  { --glow: #4ade80; }
+  .green-read  { --glow: #4ade80; --ink: #dbffe4; }
+
+  .colorless-minus, .colorless-plus { --glow: #cfe0f5; }
+  .colorless-read { --glow: #cfe0f5; --ink: #f2f7ff; }
+
+  .reset-hit { --glow: #f4d35e; }
 
   footer {
+    position: fixed;
+    bottom: 4px;
+    left: 0;
+    right: 0;
     text-align: center;
-    font-size: 0.72rem;
-    color: rgba(240,233,216,0.4);
-    padding: 20px 0 4px;
+    font-size: 0.65rem;
+    color: rgba(240,233,216,0.35);
     letter-spacing: 0.04em;
-    font-family: 'Cinzel', serif;
     text-transform: uppercase;
-    font-size: 0.62rem;
+    pointer-events: none;
   }
 </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <div class="brand">
-      <h1><span class="flourish">&#10022;</span>Mana Counter<span class="flourish">&#10022;</span></h1>
-    </div>
-    <div class="header-actions">
-      <div class="badge"><span class="diamond"></span>Total: <span id="total">0</span></div>
-      <button class="badge reset-btn" id="resetBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/></svg>
-        Reset
-      </button>
-    </div>
-  </header>
+  <div class="stage" id="stage">
+    <img class="faceplate" src="assets/faceplate.jpg" alt="Arcanum Mana Chronicle faceplate" draggable="false">
 
-  <div class="grid" id="grid"></div>
+    <div class="reading white-read" id="read-white">0</div>
+    <div class="reading blue-read" id="read-blue">0</div>
+    <div class="reading black-read" id="read-black">0</div>
+    <div class="reading red-read" id="read-red">0</div>
+    <div class="reading green-read" id="read-green">0</div>
+    <div class="reading colorless-read" id="read-colorless">0</div>
 
-  <footer>Tap &plus;/&minus; for one &middot; hold for rapid count</footer>
-</div>
+    <button class="hit btn white-minus" data-color="white" data-delta="-1" aria-label="Decrease White"></button>
+    <button class="hit btn white-plus"  data-color="white" data-delta="1"  aria-label="Increase White"></button>
+
+    <button class="hit btn blue-minus" data-color="blue" data-delta="-1" aria-label="Decrease Blue"></button>
+    <button class="hit btn blue-plus"  data-color="blue" data-delta="1"  aria-label="Increase Blue"></button>
+
+    <button class="hit btn black-minus" data-color="black" data-delta="-1" aria-label="Decrease Black"></button>
+    <button class="hit btn black-plus"  data-color="black" data-delta="1"  aria-label="Increase Black"></button>
+
+    <button class="hit btn red-minus" data-color="red" data-delta="-1" aria-label="Decrease Red"></button>
+    <button class="hit btn red-plus"  data-color="red" data-delta="1"  aria-label="Increase Red"></button>
+
+    <button class="hit btn green-minus" data-color="green" data-delta="-1" aria-label="Decrease Green"></button>
+    <button class="hit btn green-plus"  data-color="green" data-delta="1"  aria-label="Increase Green"></button>
+
+    <button class="hit btn colorless-minus" data-color="colorless" data-delta="-1" aria-label="Decrease Colorless"></button>
+    <button class="hit btn colorless-plus"  data-color="colorless" data-delta="1"  aria-label="Increase Colorless"></button>
+
+    <button class="hit reset-hit" id="resetBtn" aria-label="Reset all"></button>
+  </div>
+
+  <footer>Tap to step &middot; hold to surge</footer>
 
 <script>
 (function () {
-  const ICONS = {
-    white: '<svg viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22.5" y2="12"/><line x1="4.4" y1="4.4" x2="6.8" y2="6.8"/><line x1="17.2" y1="17.2" x2="19.6" y2="19.6"/><line x1="4.4" y1="19.6" x2="6.8" y2="17.2"/><line x1="17.2" y1="6.8" x2="19.6" y2="4.4"/></g><circle cx="12" cy="12" r="5.2" fill="currentColor"/></svg>',
-    blue: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C12 2 4.8 11.4 4.8 15.8a7.2 7.2 0 0 0 14.4 0C19.2 11.4 12 2 12 2Z"/></svg>',
-    black: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.2c-4.6 0-8.2 3.6-8.2 8 0 3 1.6 5.6 4 7v2a1 1 0 0 0 1 1h1.1v1.4c0 .3.3.6.6.6h1c.3 0 .6-.3.6-.6V20.2h.8v1.4c0 .3.3.6.6.6h1c.3 0 .6-.3.6-.6V20.2H16a1 1 0 0 0 1-1v-2c2.4-1.4 4-4 4-7 0-4.4-3.6-8-8.2-8Z"/><circle cx="9" cy="10.4" r="1.7" fill="var(--panel3)"/><circle cx="15" cy="10.4" r="1.7" fill="var(--panel3)"/><path fill="var(--panel3)" d="M11.1 12.8h1.8l-.9 2.1z"/></svg>',
-    red: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12.3 1.8c1.1 3.3-2 4.4-2.2 7.6-.1 1.4.9 2.4 2 2.4 1.3 0 2.1-1.1 1.9-2.3 1.3 1.1 2.6 3 2.6 5.3a6.6 6.6 0 1 1-13.2 0c0-3.4 1.7-4.6 2.3-6.9.3 1.1 1.1 1.7 1.1 1.7s-1.4-3.6 5.5-7.8Z"/></svg>',
-    green: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.3 7.6 8.4h1.9L5.8 14h3.6L6.6 19.6h10.8L14.6 14h3.6l-3.7-5.6h1.9L12 2.3Z"/><rect x="10.6" y="18.4" width="2.8" height="3.4" fill="currentColor"/></svg>',
-    colorless: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 2 3.8 12 12 22l8.2-10Z"/><path d="M12 2v20M3.8 12h16.4" opacity="0.55"/></svg>',
-  };
-
-  const COLORS = [
-    { key: "white",     name: "White" },
-    { key: "blue",      name: "Blue" },
-    { key: "black",     name: "Black" },
-    { key: "red",       name: "Red" },
-    { key: "green",     name: "Green" },
-    { key: "colorless", name: "Colorless" },
-  ];
-
+  const COLORS = ["white", "blue", "black", "red", "green", "colorless"];
   const STORAGE_KEY = "manaCounterState";
-  const HOLD_DELAY = 400;     // ms before rapid-fire starts
-  const HOLD_INTERVAL = 90;   // ms between rapid-fire ticks
-
-  const MINUS_ICON = '<svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>';
-  const PLUS_ICON = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
+  const HOLD_DELAY = 400;
+  const HOLD_INTERVAL = 90;
 
   let state = loadState();
-
-  const grid = document.getElementById("grid");
-  const totalEl = document.getElementById("total");
 
   function loadState() {
     try {
@@ -462,12 +238,12 @@
       if (raw) {
         const parsed = JSON.parse(raw);
         const s = {};
-        COLORS.forEach(c => { s[c.key] = Number.isFinite(parsed[c.key]) ? parsed[c.key] : 0; });
+        COLORS.forEach(c => { s[c] = Number.isFinite(parsed[c]) ? parsed[c] : 0; });
         return s;
       }
     } catch (e) {}
     const s = {};
-    COLORS.forEach(c => { s[c.key] = 0; });
+    COLORS.forEach(c => { s[c] = 0; });
     return s;
   }
 
@@ -475,95 +251,60 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
   }
 
-  function updateTotal() {
-    const total = COLORS.reduce((sum, c) => sum + state[c.key], 0);
-    totalEl.textContent = total;
+  function render(color) {
+    const el = document.getElementById("read-" + color);
+    el.textContent = state[color];
+    el.classList.remove("bump");
+    void el.offsetWidth;
+    el.classList.add("bump");
   }
 
-  function setCount(key, value, countEl) {
-    state[key] = Math.max(0, value);
-    countEl.textContent = state[key];
-    countEl.classList.remove("bump");
-    void countEl.offsetWidth;
-    countEl.classList.add("bump");
-    updateTotal();
+  function setCount(color, value) {
+    state[color] = Math.max(0, value);
+    render(color);
     saveState();
   }
 
-  COLORS.forEach(c => {
-    const card = document.createElement("div");
-    card.className = "card " + c.key;
+  document.querySelectorAll(".hit[data-color]").forEach(btn => {
+    const color = btn.dataset.color;
+    const delta = parseInt(btn.dataset.delta, 10);
+    let holdTimeout = null;
+    let holdInterval = null;
 
-    card.innerHTML = `
-      <div class="card-inner">
-        <div class="rivet tl"></div>
-        <div class="rivet tr"></div>
-        <div class="rivet bl"></div>
-        <div class="rivet br"></div>
-        <div class="name">${c.name}</div>
-        <div class="orb-wrap">
-          <div class="orb-ring"></div>
-          <div class="orb">${ICONS[c.key]}</div>
-        </div>
-        <div class="count-pill">${state[c.key]}</div>
-        <div class="buttons">
-          <button class="stepper minus" aria-label="Decrease ${c.name}">${MINUS_ICON}</button>
-          <button class="stepper plus" aria-label="Increase ${c.name}">${PLUS_ICON}</button>
-        </div>
-      </div>
-    `;
+    const step = () => setCount(color, state[color] + delta);
 
-    grid.appendChild(card);
+    const start = (e) => {
+      e.preventDefault();
+      step();
+      holdTimeout = setTimeout(() => {
+        btn.classList.add("charging");
+        holdInterval = setInterval(step, HOLD_INTERVAL);
+      }, HOLD_DELAY);
+    };
 
-    const countEl = card.querySelector(".count-pill");
-    const minusBtn = card.querySelector(".minus");
-    const plusBtn = card.querySelector(".plus");
+    const stop = () => {
+      clearTimeout(holdTimeout);
+      clearInterval(holdInterval);
+      holdTimeout = null;
+      holdInterval = null;
+      btn.classList.remove("charging");
+    };
 
-    function attachHold(btn, delta) {
-      let holdTimeout = null;
-      let holdInterval = null;
-
-      const step = () => {
-        setCount(c.key, state[c.key] + delta, countEl);
-      };
-
-      const start = (e) => {
-        e.preventDefault();
-        step(); // immediate tap response
-        holdTimeout = setTimeout(() => {
-          btn.classList.add("charging");
-          holdInterval = setInterval(step, HOLD_INTERVAL);
-        }, HOLD_DELAY);
-      };
-
-      const stop = () => {
-        clearTimeout(holdTimeout);
-        clearInterval(holdInterval);
-        holdTimeout = null;
-        holdInterval = null;
-        btn.classList.remove("charging");
-      };
-
-      btn.addEventListener("pointerdown", start);
-      btn.addEventListener("pointerup", stop);
-      btn.addEventListener("pointerleave", stop);
-      btn.addEventListener("pointercancel", stop);
-    }
-
-    attachHold(minusBtn, -1);
-    attachHold(plusBtn, 1);
+    btn.addEventListener("pointerdown", start);
+    btn.addEventListener("pointerup", stop);
+    btn.addEventListener("pointerleave", stop);
+    btn.addEventListener("pointercancel", stop);
   });
 
   document.getElementById("resetBtn").addEventListener("click", () => {
     COLORS.forEach(c => {
-      state[c.key] = 0;
+      state[c] = 0;
+      render(c);
     });
-    document.querySelectorAll(".count-pill").forEach(el => { el.textContent = "0"; });
-    updateTotal();
     saveState();
   });
 
-  updateTotal();
+  COLORS.forEach(render);
 })();
 </script>
 </body>
