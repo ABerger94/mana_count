@@ -133,13 +133,18 @@
     font-size: calc(var(--scale) * 25);
     letter-spacing: 0.02em;
     pointer-events: none;
-    color: var(--ink, #ffe9b0);
+    color: var(--ink, #2b2116);
     text-shadow:
-      0 0 calc(var(--scale) * 10) var(--glow, #ffcf6b),
-      0 calc(var(--scale) * 1) calc(var(--scale) * 2) rgba(0,0,0,0.9);
+      0 calc(var(--scale) * 1) 0 rgba(255,255,255,0.45),
+      0 calc(var(--scale) * 1.5) calc(var(--scale) * 3) rgba(43,33,22,0.3);
     transition: transform 0.15s cubic-bezier(.3,1.5,.4,1);
   }
   .reading.bump { transform: translate(-50%, -50%) scale(1.22); }
+
+  .total-read {
+    width: calc(var(--scale) * 50);
+    font-size: calc(var(--scale) * 16);
+  }
 
   /* ---------- Positions (percent of stage, from source art at 704x1527) ---------- */
   .white-minus  { left: 15.625%; top: 37.001%; }
@@ -167,25 +172,26 @@
   .colorless-read  { left: 75.994%; top: 86.2%; }
 
   .reset-hit { left: 91.619%; top: 13.425%; }
+  .total-read { left: 78.5%; top: 13.294%; }
 
-  /* ---------- Per-color glow / ink ---------- */
+  /* ---------- Per-color glow (tap feedback) / ink (readout color) ---------- */
   .white-minus, .white-plus  { --glow: #f4d35e; }
-  .white-read  { --glow: #f4d35e; --ink: #fff3cf; }
+  .white-read  { --glow: #f4d35e; --ink: #6b4f10; }
 
   .blue-minus, .blue-plus    { --glow: #4fb2ff; }
-  .blue-read   { --glow: #4fb2ff; --ink: #d8f0ff; }
+  .blue-read   { --glow: #4fb2ff; --ink: #1c3f73; }
 
   .black-minus, .black-plus  { --glow: #a78bd6; }
-  .black-read  { --glow: #a78bd6; --ink: #e7dcff; }
+  .black-read  { --glow: #a78bd6; --ink: #2e2438; }
 
   .red-minus, .red-plus      { --glow: #ff7a2e; }
-  .red-read    { --glow: #ff7a2e; --ink: #ffdcc0; }
+  .red-read    { --glow: #ff7a2e; --ink: #7a2412; }
 
   .green-minus, .green-plus  { --glow: #4ade80; }
-  .green-read  { --glow: #4ade80; --ink: #dbffe4; }
+  .green-read  { --glow: #4ade80; --ink: #1f4d2a; }
 
   .colorless-minus, .colorless-plus { --glow: #cfe0f5; }
-  .colorless-read { --glow: #cfe0f5; --ink: #f2f7ff; }
+  .colorless-read { --glow: #cfe0f5; --ink: #24263a; }
 
   .reset-hit { --glow: #f4d35e; }
 
@@ -213,6 +219,7 @@
     <div class="reading red-read" id="read-red">0</div>
     <div class="reading green-read" id="read-green">0</div>
     <div class="reading colorless-read" id="read-colorless">0</div>
+    <div class="reading total-read" id="read-total">0</div>
 
     <button class="hit btn white-minus" data-color="white" data-delta="-1" aria-label="Decrease White"></button>
     <button class="hit btn white-plus"  data-color="white" data-delta="1"  aria-label="Increase White"></button>
@@ -273,9 +280,15 @@
     el.classList.add("bump");
   }
 
+  function renderTotal() {
+    const total = COLORS.reduce((sum, c) => sum + state[c], 0);
+    document.getElementById("read-total").textContent = total;
+  }
+
   function setCount(color, value) {
     state[color] = Math.max(0, value);
     render(color);
+    renderTotal();
     saveState();
   }
 
@@ -315,10 +328,12 @@
       state[c] = 0;
       render(c);
     });
+    renderTotal();
     saveState();
   });
 
   COLORS.forEach(render);
+  renderTotal();
 })();
 
 if ("serviceWorker" in navigator) {

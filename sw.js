@@ -1,4 +1,4 @@
-const CACHE_NAME = "mana-counter-v1";
+const CACHE_NAME = "mana-counter-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
